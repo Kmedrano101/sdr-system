@@ -1,0 +1,5 @@
+certifi @ file:///C:/b/abs_4f5wo627a3/croots/recipe/certifi_1663615677642/work/certifi
+colorama==0.4.5
+Pillow==9.2.0
+qrcode==7.3.1
+wincertstore==0.2
