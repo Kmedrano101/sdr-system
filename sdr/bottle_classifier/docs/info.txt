@@ -1,0 +1,4 @@
+Data-features to consider for the maching learning bottle classifier:
+- different features
+
+Select best model in order to classifie 

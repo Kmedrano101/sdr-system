@@ -12,6 +12,11 @@ doc: Information capacity and versions of the QR code (https://www.qrcode.com/en
     - Version 2     -> 25   modules
     ...
     - Version 40    -> 177  modules
+    
+    12 _ 2bytes
+    B 1byte
+    
+    
 """
 
 # Import Modules
