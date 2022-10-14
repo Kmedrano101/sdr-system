@@ -13,7 +13,11 @@ import pickle
 from utils.constants import PATH_TRAIN,PATH_DATA, CATEGORIES
 
 class featureExtractor(object):
-    """feature extractor class for get image features"""
+    """
+    feature extractor class for get image features
+    Args:
+        object (_object_): inheritance from base object class
+    """    
     def __init__(self):
         self.__features = [None]*6      # [0: feature 1, 1: feature 2... so on]
         self.__data = []                # [0: numpy data]
@@ -38,8 +42,8 @@ class featureExtractor(object):
         self.__data = value
 
     # Functions
-    def get_features(self, image,size=(50,50), n_feature=1): #-> list
-        """_summary_
+    def get_features(self, image,size: tuple=(50,50), n_feature:int=1)-> list:
+        """
             Method to extract features from a given image
         Args:
             image (_Image_): Image to extract features from.
@@ -74,7 +78,7 @@ class featureExtractor(object):
         return self.features[n_feature-1]
 
     def get_dataset(self) -> list:
-        """_summary_
+        """
             Method to get dataset from the features array
         Args:
             None
@@ -102,8 +106,14 @@ class featureExtractor(object):
         self.data = dataset
         return self.data
 
-    def save_data(self,name) -> None: # Add differents types of files
-        """ Save the dataset as a file into a directory"""
+    def save_data(self,name: str = 'data') -> None:
+        """
+        Save the dataset as a file into a directory
+        Args:
+            name (str, optional): name of the file. Defaults to 'data'.
+        Raises:
+            Exception: When variable self.data does not have data yet.
+        """        
         if self.data:
             file = open(PATH_DATA+name+'.pkl','wb')
             pickle.dump(self.data,file)
@@ -112,7 +122,11 @@ class featureExtractor(object):
             raise Exception("No data found!, make sure to run get dataset function first") 
 
     def show_graphic_features(self) -> None:
-        """Show on a single windows the whole features"""
+        """
+        Show on a single windows the whole features
+        Raises:
+            Exception: When variable self.features does not have data yet.
+        """        
         if self.features:
             top_img = np.concatenate((self.features[0],self.features[1],self.features[2]),axis=1)
             bottom_img = np.concatenate((self.features[3],self.features[4],self.features[5]),axis=1)
