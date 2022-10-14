@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Machine learning model selector
+Features Extraction from an image
 @author: Kmedrano101
 Created on Thu Oct 13 10:59:07 2022
 """

@@ -15,11 +15,18 @@ dataN3 = np.ones((10,1))
 
 dataFinal = np.concatenate((dataN1,dataN2,dataN3),axis=1)
 
+file = open('data/dataset/data_v1.pkl', 'rb')
+dataset = pickle.load(file)
+file.close()
 
-test = []
+a = [2,2]
+b = [3,3]
+b = b+a
+print(b)
 
-if not test:
-    print("thres is data")
+models = [0]*7
+print(models)
+
 
 #data['Feature 2'] = dataN2
 #print(data)
