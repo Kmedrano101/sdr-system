@@ -16,14 +16,14 @@ from sklearn.metrics import recall_score, precision_score, f1_score
 from utils.constants import PATH_DATA, PATH_MODEL, MODEL_NAMES
 import pickle, random
 from datetime import datetime
-
+from time import time
+from statistics import mean
 # Algorithms for classifications
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
-from sklearn.linear_model import SGDClassifier, Perceptron
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from xgboost import XGBClassifier
+import lightgbm as lgb
+
 
 
 class modelSelector(object):
@@ -34,10 +34,12 @@ class modelSelector(object):
     """
     def __init__(self):
         self.__dataset = None
-        self.__models = [None]*7
-        self._cmatrix_plots = [None]*7      # 0:RF, 1:GB, 2:GP, 3:SGD, 4:PC, 5:KN, 6:SVM 
-        self._accuracy_values = [None]*7    # 0:RF, 1:GB, 2:GP, 3:SGD, 4:PC, 5:KN, 6:SVM 
-
+        self.__models = [None]*4
+        self._cmatrix_plots = [None]*4      # 0:SVM, 1:GB, 2:XGB, 3:LGB
+        self._accuracy_values = {0: {'Accuracy': 0,'crossVal': 0,'Speed': 0},
+                                 1:  {'Accuracy': 0,'crossVal': 0,'Speed': 0},
+                                 2: {'Accuracy': 0,'crossVal': 0,'Speed': 0},
+                                 3: {'Accuracy': 0,'crossVal': 0,'Speed': 0}}
     # Properties
     @property
     def dataset(self):
@@ -98,74 +100,78 @@ class modelSelector(object):
         if self.dataset is None:
             raise Exception("Dataset not loaded!")
         else:
-            X = []
-            y = []
-            # Random Forest Classifier
-            rf_model = RandomForestClassifier()
-            self.models[0] = rf_model
+            X,y = [],[]
+            # Get X and y values
+            for feature,label in self.dataset:
+                X.append(feature)
+                y.append(label)
+            # SVM Classifier
+            svm_model = SVC(C=1,kernel='poly',gamma='auto') 
+            self.models[0] = svm_model
             # Gradient Boosting Classifier
             gb_model = GradientBoostingClassifier()
             self.models[1] = gb_model
-            # Gaussian Process Classifier
-            kernel = 1.0 * RBF(1.0)
-            gp_model = GaussianProcessClassifier(kernel=kernel)
-            self.models[2] = gp_model
-            # SGD Classifier
-            sgd_model = SGDClassifier()
-            self.models[3] = sgd_model
-            # Perceptron Classifier
-            p_model = Perceptron()
-            self.models[4] = p_model
-            # KNeighbors Classifier
-            kn_model = KNeighborsClassifier()
-            self.models[5] = kn_model
-            # SVM Classifier
-            svm_model = SVC(C=1,kernel='poly',gamma='auto') 
-            self.models[6] = svm_model
-            y_pred = [None]*7
-            acc = [None]*2
+            # Extreme Gradient Boosting Classifier
+            xgb_model = XGBClassifier()
+            self.models[2] = xgb_model
+            # lighGBM Classifier
+            lgb_model = lgb.LGBMClassifier()
+            self.models[3] = lgb_model
+            y_pred = [None]*len(self.models)
+            acc = [None]*len(self.models)
             
             # Training
             print("Training start time",datetime.now().strftime("%H:%M:%S"))
             for n_iter in range(iterations):
-                # Get X and y values
-                for feature,label in self.dataset:
-                    X.append(feature)
-                    y.append(label)
                 # Split dataset into X train-test and y train-test 
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-                for i in range(7):
+                for i in range(len(self.models)):
                     self.models[i] = self.models[i].fit(X_train, y_train)
+                    
                 # Predictors
-                for i in range(7):
+                for i in range(len(self.models)):
                     y_pred[i] = self.models[i].predict(X_test)
                     cm = confusion_matrix(y_test, y_pred[i])
                     self.cmatrix_plots[i] = ConfusionMatrixDisplay(confusion_matrix=cm)
+                
                 # Save accuracy values
-                for i in range(7):
-                    acc[0] = accuracy_score(y_test, y_pred[i])
-                    acc[1] = cross_val_score(self.models[i], X_train, y_train, cv=5, scoring='f1_macro').mean()
+                for i in range(len(self.models)):
+                    start = time()
+                    acc = accuracy_score(y_test, y_pred[i])
+                    cval = cross_val_score(self.models[i], X_train, y_train, 
+                                           cv=5, scoring='f1_macro').mean()
+                    tm = np.round(time()-start,3)
                     if n_iter > 0:
-                        acc1 = (self.accuracy_values[i][0] + acc[0]) / 2
-                        acc2 = (self.accuracy_values[i][1] + acc[1]) / 2
-                        self.accuracy_values[i][0] = acc1
-                        self.accuracy_values[i][1] = acc2
+                        acc_mean = mean([self.accuracy_values[i]['Accuracy'], acc])
+                        cval_mean = mean([self.accuracy_values[i]['crossVal'], cval])
+                        tm_mean = sum([self.accuracy_values[i]['Speed'], tm])
+                        self.accuracy_values[i]['Accuracy'] = acc_mean
+                        self.accuracy_values[i]['crossVal'] = cval_mean
+                        self.accuracy_values[i]['Speed'] = tm_mean
                     else:
-                        self.accuracy_values[i] = acc.copy()
+                        self.accuracy_values[i]['Accuracy'] = acc
+                        self.accuracy_values[i]['crossVal'] = cval
+                        self.accuracy_values[i]['Speed'] = tm
+
+                progress = round((((n_iter+1) * 100)/ iterations),2)
+                print(f"Progress percentage... {progress} %")
             print("Training finish time",datetime.now().strftime("%H:%M:%S"))
 
     def save_models(self)-> None:
         """
         Save all models in the directory
         """        
-        for i in range(7):
+        for i in range(len(self.models)):
             joblib.dump(self.models[i], PATH_MODEL+MODEL_NAMES[i])
 
-# Testing v0.1 working
+# Testing v0.2 working
 obj = modelSelector()
-obj.load_data(path='data/dataset/data.pkl')
-obj.train_models()
+obj.load_data(path='data/dataset/data_glass_plastic.pkl')
+obj.train_models(iterations=10)
 obj.save_models()
 print(obj.accuracy_values)
 obj.cmatrix_plots[0].plot()
+obj.cmatrix_plots[1].plot()
+obj.cmatrix_plots[2].plot()
+obj.cmatrix_plots[3].plot()
 plt.show()
