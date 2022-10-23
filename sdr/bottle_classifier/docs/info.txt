@@ -2,3 +2,7 @@ Data-features to consider for the maching learning bottle classifier:
 - different features
 
 Select best model in order to classifie 
+
+for the final implementation to train de models consider:
+- Crop the image where the bottle is expected
+- Distance between the camera and bottle don´t change

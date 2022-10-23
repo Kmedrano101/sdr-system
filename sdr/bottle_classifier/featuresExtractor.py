@@ -65,7 +65,8 @@ class featureExtractor(object):
         self.features[1] = img_mBlur
         _,img_thresh = cv.threshold(img_mBlur,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
         self.features[2] = img_thresh 
-        img_morph = cv.morphologyEx(img_mBlur, cv.MORPH_OPEN, cv.getStructuringElement(cv.MORPH_ELLIPSE, (5,5)))
+        img_morph = cv.morphologyEx(img_mBlur, cv.MORPH_OPEN, 
+                                    cv.getStructuringElement(cv.MORPH_ELLIPSE, (5,5)))
         self.features[3] = img_morph
         img_edges = cv.Canny(img_morph,20,60)
         self.features[4] = img_edges
@@ -83,7 +84,7 @@ class featureExtractor(object):
         Args:
             None
         """
-        # Creating dataset
+        # data
         dataset = []
         # Collecting dataset
         for c in CATEGORIES:
@@ -121,28 +122,58 @@ class featureExtractor(object):
         else:
             raise Exception("No data found!, make sure to run get dataset function first") 
 
-    def show_graphic_features(self) -> None:
+    def show_graphic_features(self, path_save: str) -> None:
         """
         Show on a single windows the whole features
         Raises:
             Exception: When variable self.features does not have data yet.
         """        
         if self.features:
-            top_img = np.concatenate((self.features[0],self.features[1],self.features[2]),axis=1)
-            bottom_img = np.concatenate((self.features[3],self.features[4],self.features[5]),axis=1)
+            top_img = np.concatenate((self.features[0],self.features[1],
+                                      self.features[2]),axis=1)
+            bottom_img = np.concatenate((self.features[3],self.features[4],
+                                         self.features[5]),axis=1)
             image = np.concatenate((top_img,bottom_img),axis=0)
+            if path_save:
+                cv.imwrite(path_save,image)
             cv.imshow('Features Image',image)
             cv.waitKey(0)
             cv.destroyAllWindows()
         else:
             raise Exception("No features found!, make sure to run get features function first")
 
-# Testing v0.1 working
+    def get_sideBottle(self, matrix) -> int:
+        """
+        Args:
+            img (_Image_): Image object to detect side bottle
+
+        Returns:
+            int: 1 if the bottle is the right side otherwise 0
+        """        
+        side = None
+        row,_ = matrix.shape
+        up_black = np.sum(matrix[:int(row/2),:]==0)
+        down_black = np.sum(matrix[int(row/2):,:]==0)
+        if up_black < down_black:
+            side = 1
+            return side
+        else:
+            side = 0
+        return side
+        
+        
+
+# Testing v0.2 working
 obj = featureExtractor()
-img = cv.imread(PATH_TRAIN+'bottle1/10.jpeg')
-obj.get_features(img,size=(250,300))
+img = cv.imread(PATH_TRAIN+'n_lvirgen/IMG20221020155231.jpg')
+img_feature = obj.get_features(img,n_feature=3)
+if obj.get_sideBottle(img_feature) == 1:
+    print("Side of the bottle is right!")
+else:
+    print("Side of the bottle is wrong!")
+obj.show_graphic_features()
 data = obj.get_dataset()
-obj.save_data('data_v1')
+obj.save_data('data_glass_plastic')
 obj.show_graphic_features()
 print("Finish")
 

@@ -8,32 +8,20 @@ Created on Thu Oct 13 15:29:31 2022
 import numpy as np
 import pandas as pd
 import pickle
+import os
+from pathlib import Path
 
-dataN1 = np.ones((10,1))
-dataN2 = np.zeros((10,1))
-dataN3 = np.ones((10,1))
+p = Path('.')
+#[print(x) for x in p.iterdir() if x.is_dir()]
 
-dataFinal = np.concatenate((dataN1,dataN2,dataN3),axis=1)
+dicc = {'SVM': {'accuracy':0.0,'cross val': 3.0,'speed':0.0}}
 
-file = open('data/dataset/data_v1.pkl', 'rb')
-dataset = pickle.load(file)
-file.close()
+print(dicc['SVM']['cross val'])
 
-a = [2,2]
-b = [3,3]
-b = b+a
-print(b)
+listaA = [None]*4
 
-models = [0]*7
-print(models)
+print(len(listaA))
+
+print(sum([2,3]))
 
 
-#data['Feature 2'] = dataN2
-#print(data)
-
-
-
-"""pick_in = open('data/dataset/data.pkl','rb')
-data = pickle.load(pick_in)
-pick_in.close()
-"""
