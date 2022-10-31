@@ -15,7 +15,7 @@ import numpy as np
 
 PATH_MODEL = 'model/glass_beers/' # this just for test
 
-class predictor(featureExtractor):
+class predictorModel(featureExtractor):
     def __init__(self):
         self.result = None
         self.model = None
@@ -39,9 +39,17 @@ class predictor(featureExtractor):
             raise Exception("model not loaded!")
         return self.result
     
-obj = predictor()
-image = cv.imread('data/train/n_lvirgen/IMG20221020153326.jpg')
+"""obj = predictorModel()
+image = cv.imread('data/test/test_Y_2.jpeg')
+img = cv.resize(image, (560,580), interpolation=cv.INTER_AREA)
+img = cv.rectangle(img,(140,0),(420,580),color=(0, 255, 0), thickness=3)
 obj.load_model()
-print(obj.make_prediction(image))
-print("finish")
+if obj.make_prediction(image) == 1:
+    img = cv.putText(img, 'Bottle: YES', (20, 50), cv.FONT_HERSHEY_SIMPLEX, 2,(255, 0, 0),2, cv.LINE_AA)
+else:
+    img = cv.putText(img, 'Bottle: NO', (20, 50), cv.FONT_HERSHEY_SIMPLEX, 2,(255, 0, 0),2, cv.LINE_AA)
+cv.imshow('Prediction',img)
+cv.waitKey(0)
+cv.destroyAllWindows()
+print("finish")"""
         

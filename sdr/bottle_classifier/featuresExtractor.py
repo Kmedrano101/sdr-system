@@ -95,13 +95,14 @@ class featureExtractor(object):
                 imgpath = os.path.join(path, img)
                 # Read the image
                 image = cv.imread(imgpath)
-                self.get_features(image)
+                self.get_features(image,size=(320,340))
                 data_f1 = np.array(self.features[0]).flatten()
                 data_f2 = np.array(self.features[1]).flatten()
                 data_f3 = np.array(self.features[2]).flatten()
                 data_f4 = np.array(self.features[3]).flatten()
                 data_f5 = np.array(self.features[4]).flatten()
                 data_f6 = np.array(self.features[5]).flatten()
+                self.show_graphic_features('test/testv2.jpg')
                 data = np.concatenate((data_f1,data_f2,data_f3,data_f4,data_f5,data_f6),axis=0)
                 dataset.append([data,label])
         self.data = dataset
@@ -137,8 +138,8 @@ class featureExtractor(object):
             if path_save:
                 cv.imwrite(path_save,image)
             cv.imshow('Features Image',image)
-            cv.waitKey(0)
-            cv.destroyAllWindows()
+            cv.waitKey(20) # Set 0 to stop window
+            #cv.destroyAllWindows()
         else:
             raise Exception("No features found!, make sure to run get features function first")
 
@@ -165,15 +166,16 @@ class featureExtractor(object):
 
 # Testing v0.2 working
 obj = featureExtractor()
-img = cv.imread(PATH_TRAIN+'n_lvirgen/IMG20221020155231.jpg')
-img_feature = obj.get_features(img,n_feature=3)
-if obj.get_sideBottle(img_feature) == 1:
-    print("Side of the bottle is right!")
-else:
-    print("Side of the bottle is wrong!")
-obj.show_graphic_features()
+#img = cv.imread(PATH_TRAIN+'n_lvirgen/IMG20221020155231.jpg')
+#img_feature = obj.get_features(img,n_feature=3)
+#if obj.get_sideBottle(img_feature) == 1:
+#    print("Side of the bottle is right!")
+#else:
+#    print("Side of the bottle is wrong!")
+#obj.show_graphic_features()
 data = obj.get_dataset()
-obj.save_data('data_glass_plastic')
-obj.show_graphic_features()
+#obj.save_data('data_glass_plastic')
+#obj.show_graphic_features()
+cv.destroyAllWindows()
 print("Finish")
 
