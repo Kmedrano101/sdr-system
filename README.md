@@ -36,7 +36,7 @@ Este proyecto se distribuye bajo la Licencia [MIT](https://opensource.org/licens
 
 ## Contacto
 
-Si tienes alguna pregunta o sugerencia relacionada con este proyecto, no dudes en ponerte en contacto conmigo. Puedes enviarme un correo electrónico a [correo@example.com](mailto:kevin.ejem18@gmail.com).
+Si tienes alguna pregunta o sugerencia relacionada con este proyecto, no dudes en ponerte en contacto conmigo. Puedes enviarme un correo electrónico a [kevin.ejem18@gmail.com](mailto:kevin.ejem18@gmail.com).
 
 
 
